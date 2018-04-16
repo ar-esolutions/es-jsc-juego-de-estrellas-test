@@ -1,0 +1,37 @@
+# thumbnails created by Windows
+Thumbs.db
+
+# files & directories created by Maven
+overlays/
+target/
+
+# files & directories created by IntelliJ
+.idea/
+*.iml
+
+# files & directories created by Eclipse
+bin/
+.settings/
+*.classpath
+*.project
+*.tern-project
+
+# files & directories created by BlueJ
+*.ctxt
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
