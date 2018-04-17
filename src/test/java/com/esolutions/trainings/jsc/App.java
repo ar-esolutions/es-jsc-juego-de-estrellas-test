@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -158,6 +159,9 @@ public class App {
 
 	}
 
+	private static final String[] EXPECTED_REQ2 = {"acosta", "aguilar", "alarcón", "camarena", "gaspar",
+			"gastan", "morelos", "pedrosa", "teyo", "álvarez"};
+
 	private RestTemplate restTemplate;
 
 	@Before
@@ -173,6 +177,10 @@ public class App {
 		return CONTEXT.concat("/matches/").concat(year);
 	}
 
+	private static String urlReq2() {
+		return CONTEXT.concat("/players/last-name/repeated");
+	}
+
 	@Test
 	public void req_1() {
 		for (int year = LOWER_LIMIT; year <= UPPER_LIMIT; year++) {
@@ -183,5 +191,19 @@ public class App {
 
 			assertThat(actual, is(equalTo(expected)));
 		}
+	}
+
+	@Test
+	public void req_2() {
+		final List<String> response = this.restTemplate.getForObject(urlReq2(), RepeatedLastNameModel.class).getLast_names();
+
+		for (int i = 0; i < EXPECTED_REQ2.length; i++) {
+			final String actual = response.get(i);
+			String expected = EXPECTED_REQ2[i];
+			LOGGER.info("Actual: '{}', expected: '{}'", actual, expected);
+
+			assertThat(actual, is(expected));
+		}
+
 	}
 }
