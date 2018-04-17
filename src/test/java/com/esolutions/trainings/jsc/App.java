@@ -24,7 +24,8 @@ public class App {
 	private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
 	private static final String CONTEXT = "http://localhost:9090";
-	private static final int[] LIMITS = {1900, 2018};
+	private static final int LOWER_LIMIT = 1900;
+	private static final int UPPER_LIMIT = 2018;
 
 	private static final Map<Integer, MatchModel> EXPECTED_REQ1;
 
@@ -174,12 +175,11 @@ public class App {
 
 	@Test
 	public void req_1() {
-		for (int year = LIMITS[0]; year <= LIMITS[1]; year++) {
+		for (int year = LOWER_LIMIT; year <= UPPER_LIMIT; year++) {
 			final MatchModel actual = this.restTemplate.getForObject(urlReq1(year), MatchModel.class);
 			LOGGER.info("Actual: {}", actual);
 
 			final MatchModel expected = EXPECTED_REQ1.get(year);
-
 
 			assertThat(actual, is(equalTo(expected)));
 		}
