@@ -9,15 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -159,8 +159,22 @@ public class App {
 
 	}
 
-	private static final String[] EXPECTED_REQ2 = {"acosta", "aguilar", "alarcón", "camarena", "gaspar",
-			"gastan", "morelos", "pedrosa", "teyo", "álvarez"};
+	private static final List<String> EXPECTED_REQ2;
+
+	static {
+		EXPECTED_REQ2 = new ArrayList<>();
+		EXPECTED_REQ2.add("acosta");
+		EXPECTED_REQ2.add("aguilar");
+		EXPECTED_REQ2.add("alarcón");
+		EXPECTED_REQ2.add("camarena");
+		EXPECTED_REQ2.add("gaspar");
+		EXPECTED_REQ2.add("gastan");
+		EXPECTED_REQ2.add("morelos");
+		EXPECTED_REQ2.add("pedrosa");
+		EXPECTED_REQ2.add("teyo");
+		EXPECTED_REQ2.add("álvarez");
+	}
+
 
 	private RestTemplate restTemplate;
 
@@ -183,13 +197,15 @@ public class App {
 
 	@Test
 	public void req_1() {
-		for (int year = LOWER_LIMIT; year <= UPPER_LIMIT; year++) {
-			final MatchModel actual = this.restTemplate.getForObject(urlReq1(year), MatchModel.class);
-			LOGGER.info("Actual: {}", actual);
+		final List<MatchModel> wrongAnswers = IntStream
+				.range(LOWER_LIMIT, UPPER_LIMIT + 1)
+				.mapToObj(year -> this.restTemplate.getForObject(urlReq1(year), MatchModel.class))
+				.filter(match -> !match.equals(EXPECTED_REQ1.get(match.getYear())))
+				.peek(match -> LOGGER.warn("Actual: {} does not match expected: {}", match, EXPECTED_REQ1.get(match.getYear())))
+				.collect(Collectors.toList());
 
-			final MatchModel expected = EXPECTED_REQ1.get(year);
-
-			assertThat(actual, is(equalTo(expected)));
+		if (!wrongAnswers.isEmpty()) {
+			fail();
 		}
 	}
 
@@ -197,13 +213,23 @@ public class App {
 	public void req_2() {
 		final List<String> response = this.restTemplate.getForObject(urlReq2(), RepeatedLastNameModel.class).getLast_names();
 
-		for (int i = 0; i < EXPECTED_REQ2.length; i++) {
-			final String actual = response.get(i);
-			String expected = EXPECTED_REQ2[i];
-			LOGGER.info("Actual: '{}', expected: '{}'", actual, expected);
-
-			assertThat(actual, is(expected));
+		boolean pass = true;
+		for (String actual : response) {
+			if (!EXPECTED_REQ2.contains(actual)) {
+				LOGGER.warn("Actual '{}' is not repeated", actual);
+				pass = false;
+			}
 		}
 
+		for (String expected : EXPECTED_REQ2) {
+			if(!response.contains(expected)) {
+				LOGGER.warn("Expected '{}' is not in response", expected);
+				pass = false;
+			}
+		}
+
+		if(!pass) {
+			fail();
+		}
 	}
 }
