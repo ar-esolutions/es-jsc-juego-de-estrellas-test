@@ -211,10 +211,12 @@ public class App {
 
 	@Test
 	public void req_2() {
-		final List<String> response = this.restTemplate.getForObject(urlReq2(), RepeatedLastNameModel.class).getLast_names();
+		final RepeatedLastNameModel response = this.restTemplate.getForObject(urlReq2(), RepeatedLastNameModel.class);
+
+		final List<String> actualReponse = response.getLastNames1() != null ? response.getLastNames1() : response.getLastNames2();
 
 		boolean pass = true;
-		for (String actual : response) {
+		for (String actual : actualReponse) {
 			if (!EXPECTED_REQ2.contains(actual)) {
 				LOGGER.warn("Actual '{}' is not repeated", actual);
 				pass = false;
@@ -222,13 +224,13 @@ public class App {
 		}
 
 		for (String expected : EXPECTED_REQ2) {
-			if(!response.contains(expected)) {
+			if (!actualReponse.contains(expected)) {
 				LOGGER.warn("Expected '{}' is not in response", expected);
 				pass = false;
 			}
 		}
 
-		if(!pass) {
+		if (!pass) {
 			fail();
 		}
 	}

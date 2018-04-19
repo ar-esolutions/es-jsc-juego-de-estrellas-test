@@ -1,15 +1,29 @@
 package com.esolutions.trainings.jsc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class RepeatedLastNameModel {
-	private List<String> last_names;
+	@JsonProperty("last_names")
+	private List<String> lastNames1;
 
-	public List<String> getLast_names() {
-		return last_names;
+	@JsonProperty("last-names")
+	private List<String> lastNames2;
+
+	public List<String> getLastNames1() {
+		return lastNames1;
 	}
 
-	public void setLast_names(List<String> last_names) {
-		this.last_names = last_names;
+	public void setLastNames1(List<String> lastNames1) {
+		this.lastNames1 = lastNames1;
+	}
+
+	public List<String> getLastNames2() {
+		return lastNames2;
+	}
+
+	public void setLastNames2(List<String> lastNames2) {
+		this.lastNames2 = lastNames2;
 	}
 }
