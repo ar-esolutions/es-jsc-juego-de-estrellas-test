@@ -179,7 +179,7 @@ public class App {
 	private RestTemplate restTemplate;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		restTemplate = new RestTemplate();
 	}
 
@@ -197,12 +197,7 @@ public class App {
 
 	@Test
 	public void req_1() {
-		final List<MatchModel> wrongAnswers = IntStream
-				.range(1930, UPPER_LIMIT + 1)
-				.mapToObj(year -> this.restTemplate.getForObject(urlReq1(year), MatchModel.class))
-				.filter(match -> !match.equals(EXPECTED_REQ1.get(match.getYear())))
-				.peek(match -> LOGGER.warn("Actual: {} does not match expected: {}", match, EXPECTED_REQ1.get(match.getYear())))
-				.collect(Collectors.toList());
+		final List<MatchModel> wrongAnswers = wrongAnswersWithLimits(1930, UPPER_LIMIT);
 
 		if (!wrongAnswers.isEmpty()) {
 			fail();
@@ -233,5 +228,23 @@ public class App {
 		if (!pass) {
 			fail();
 		}
+	}
+
+	@Test
+	public void req_4() {
+		final List<MatchModel> wrongAnswers = wrongAnswersWithLimits(LOWER_LIMIT, UPPER_LIMIT);
+
+		if (!wrongAnswers.isEmpty()) {
+			fail();
+		}
+	}
+
+	private List<MatchModel> wrongAnswersWithLimits(int from, int to) {
+		return IntStream
+				.range(from, to + 1)
+				.mapToObj(year -> this.restTemplate.getForObject(urlReq1(year), MatchModel.class))
+				.filter(match -> !match.equals(EXPECTED_REQ1.get(match.getYear())))
+				.peek(match -> LOGGER.warn("Actual: {} does not match expected: {}", match, EXPECTED_REQ1.get(match.getYear())))
+				.collect(Collectors.toList());
 	}
 }
