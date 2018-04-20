@@ -198,7 +198,7 @@ public class App {
 	@Test
 	public void req_1() {
 		final List<MatchModel> wrongAnswers = IntStream
-				.range(LOWER_LIMIT, UPPER_LIMIT + 1)
+				.range(1930, UPPER_LIMIT + 1)
 				.mapToObj(year -> this.restTemplate.getForObject(urlReq1(year), MatchModel.class))
 				.filter(match -> !match.equals(EXPECTED_REQ1.get(match.getYear())))
 				.peek(match -> LOGGER.warn("Actual: {} does not match expected: {}", match, EXPECTED_REQ1.get(match.getYear())))
