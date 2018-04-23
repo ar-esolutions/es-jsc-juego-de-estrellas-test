@@ -175,6 +175,44 @@ public class App {
 		EXPECTED_REQ2.add("álvarez");
 	}
 
+	private static final RankingModel EXPECTED_REQ3;
+
+	static {
+		EXPECTED_REQ3 =  new RankingModel();
+
+		List<PlayerModel> playersAmerica = new ArrayList<>();
+		playersAmerica.add(PlayerModel.build("camino,óscar", 7L));
+		playersAmerica.add(PlayerModel.build("garia,alberto", 7L));
+		playersAmerica.add(PlayerModel.build("pecina,tomas", 7L));
+		playersAmerica.add(PlayerModel.build("Sandy, Adas", 6L));
+		playersAmerica.add(PlayerModel.build("acosta,matias", 6L));
+		playersAmerica.add(PlayerModel.build("aguilar,dorantes", 6L));
+		playersAmerica.add(PlayerModel.build("camarena,dorantes", 6L));
+		playersAmerica.add(PlayerModel.build("campa,óscar", 6L));
+		playersAmerica.add(PlayerModel.build("pedraza,tomas", 6L));
+		playersAmerica.add(PlayerModel.build("villanueba,gabriel", 6L));
+
+		List<PlayerModel> playersEuropa = new ArrayList<>();
+		playersEuropa.add(PlayerModel.build("campos,javier", 7L));
+		playersEuropa.add(PlayerModel.build("morales,óscar", 7L));
+		playersEuropa.add(PlayerModel.build("texeda,rodrigo", 7L));
+		playersEuropa.add(PlayerModel.build("villalvazo,salvador", 7L));
+		playersEuropa.add(PlayerModel.build("villanueba,gabriel", 7L));
+		playersEuropa.add(PlayerModel.build("Bairn, Roberyl", 6L));
+		playersEuropa.add(PlayerModel.build("camino,óscar", 6L));
+		playersEuropa.add(PlayerModel.build("gascon,raúl", 6L));
+		playersEuropa.add(PlayerModel.build("pavon,tomas", 6L));
+		playersEuropa.add(PlayerModel.build("villalva,santiago", 6L));
+
+		TeamModel teamAmerica = new TeamModel();
+		TeamModel teamEuropa = new TeamModel();
+		teamAmerica.setPlayers(playersAmerica);
+		teamEuropa.setPlayers(playersEuropa);
+
+		EXPECTED_REQ3.setEstrellas_de_america(teamAmerica);
+		EXPECTED_REQ3.setEstrellas_de_europa(teamEuropa);
+	}
+
 
 	private RestTemplate restTemplate;
 
@@ -193,6 +231,10 @@ public class App {
 
 	private static String urlReq2() {
 		return CONTEXT.concat("/players/last-name/repeated");
+	}
+
+	private static String urlReq3() {
+		return CONTEXT.concat("/players/ranking");
 	}
 
 	@Test
@@ -228,6 +270,41 @@ public class App {
 		if (!pass) {
 			fail();
 		}
+	}
+
+	@Test
+	public void req_3() {
+		final RankingModel response = this.restTemplate.getForObject(urlReq3(), RankingModel.class);
+
+		boolean pass = true;
+
+		for (int i = 0; i < response.getEstrellas_de_america().getPlayers().size(); i++) {
+			PlayerModel expected = EXPECTED_REQ3.getEstrellas_de_america().getPlayers().get(i);
+			PlayerModel actual = response.getEstrellas_de_america().getPlayers().get(i);
+			if (!(expected.getName().equals(actual.getName()) && expected.getPlayed().equals(actual.getPlayed()))) {
+				LOGGER.warn("Actual: {} does not match expected: {}", getRankedPlayer(actual), getRankedPlayer(expected));
+				pass = false;
+			}
+		}
+
+		for (int i = 0; i < response.getEstrellas_de_europa().getPlayers().size(); i++) {
+			PlayerModel expected = EXPECTED_REQ3.getEstrellas_de_europa().getPlayers().get(i);
+			PlayerModel actual = response.getEstrellas_de_europa().getPlayers().get(i);
+			if (!(expected.getName().equals(actual.getName()) && expected.getPlayed().equals(actual.getPlayed()))) {
+				LOGGER.warn("Actual: {} does not match expected: {}", getRankedPlayer(actual), getRankedPlayer(expected));
+				pass = false;
+			}
+		}
+
+		if (!pass) {
+			fail();
+		}
+
+	}
+
+	private String getRankedPlayer(PlayerModel model) {
+		String message = "{name: %s, played: %s }";
+		return message.format(message, model.getName(), model.getPlayed());
 	}
 
 	@Test
