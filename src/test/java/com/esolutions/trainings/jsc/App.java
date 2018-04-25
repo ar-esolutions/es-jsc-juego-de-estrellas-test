@@ -278,6 +278,16 @@ public class App {
 
 		boolean pass = true;
 
+		int totalPlayers = 10;
+
+		if (response.getEstrellas_de_america().getPlayers().size() != totalPlayers) {
+            LOGGER.warn("The amount of players is not correct for America. Actual: {} does not match expected: {}", response.getEstrellas_de_america().getPlayers().size(), totalPlayers);
+            pass = false;
+		} else if (response.getEstrellas_de_europa().getPlayers().size() != totalPlayers) {
+            LOGGER.warn("The amount of players is not correct for Europe. Actual: {} does not match expected: {}", response.getEstrellas_de_europa().getPlayers().size(), totalPlayers);
+            pass = false;
+		}
+
 		for (int i = 0; i < response.getEstrellas_de_america().getPlayers().size(); i++) {
 			PlayerModel expected = EXPECTED_REQ3.getEstrellas_de_america().getPlayers().get(i);
 			PlayerModel actual = response.getEstrellas_de_america().getPlayers().get(i);
